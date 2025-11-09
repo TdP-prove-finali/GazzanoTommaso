@@ -37,4 +37,4 @@ class DBConnect:
                     print(err)
                     return None
         else:
-            return cls._cnxpool.g
+            return cls._cnxpool.get_connection()
