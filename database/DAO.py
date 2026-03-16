@@ -4,7 +4,7 @@ from model.Retailer import Retailer
 
 class DAO():
     @staticmethod
-    def getAllRetailers(type, productLine, dateFrom, dateTo):
+    def getAllRetailers(type, dateFrom, dateTo):
         '''
         metodo che estrae dal Database tutti i retailer che soddisfano i requisiti scelti dall'utente attraverso i filtri
         dell'interfaccia grafica
@@ -33,11 +33,10 @@ class DAO():
                             r.Retailer_code = ds.Retailer_code
                             AND ds.Product_number = p.Product_number
                             AND r.Type = %s
-                            AND p.Product_line = %s
                             AND ds.Date BETWEEN %s AND %s
                         ORDER BY
                             r.Retailer_code'''
-            cursor.execute(query, (type, productLine, dateFrom, dateTo))
+            cursor.execute(query, (type, dateFrom, dateTo))
 
             for row in cursor:
                 result.append(Retailer(row["Retailer_code"], row["Retailer_name"], row["Type"], row["Country"]))
@@ -71,32 +70,85 @@ class DAO():
             cnx.close()
         return result
 
+    # @staticmethod
+    # def getAllProductLines(rtype):
+    #     '''
+    #     Estrazione dal Database delle ProductLines legate alla tipologia di Retailer
+    #     :param rtype: str
+    #     :return: list(str)
+    #     '''
+    #     cnx = DBConnect.get_connection()
+    #     result = []
+    #     if cnx is None:
+    #         print("Connessione Fallita")
+    #     else:
+    #         cursor = cnx.cursor(dictionary=True)
+    #         query = """
+    #                 SELECT DISTINCT p.Product_line AS pl
+    #                 FROM go_retailers r, go_daily_sales ds, go_products p
+    #                 WHERE r.Retailer_code = ds.Retailer_code
+    #                   AND ds.Product_number = p.Product_number
+    #                   AND r.`Type`  = %s
+    #                 ORDER BY pl
+    #                 """
+    #
+    #         cursor.execute(query, (rtype, ))
+    #
+    #         for row in cursor:
+    #             result.append(row["pl"])
+    #
+    #         cursor.close()
+    #         cnx.close()
+    #     return result
+
     @staticmethod
-    def getAllProductLines(rtype):
-        '''
-        Estrazione dal Database delle ProductLines legate alla tipologia di Retailer
-        :param rtype: str
-        :return: list(str)
-        '''
+    def getAllEdges(rtype, dateFrom, dateTo, Affinity):
+
         cnx = DBConnect.get_connection()
         result = []
         if cnx is None:
             print("Connessione Fallita")
         else:
             cursor = cnx.cursor(dictionary=True)
-            query = """
-                    SELECT DISTINCT p.Product_line AS pl
-                    FROM go_retailers r, go_daily_sales ds, go_products p
-                    WHERE r.Retailer_code = ds.Retailer_code
-                      AND ds.Product_number = p.Product_number
-                      AND r.`Type`  = %s
-                    ORDER BY pl
-                    """
-
-            cursor.execute(query, (rtype, ))
-
+            query = """SELECT
+                            a.Retailer_code AS r1,
+                            b.Retailer_code AS r2,
+                            COUNT(DISTINCT a.Product_number) AS affinity
+                        FROM
+                            (
+                                SELECT DISTINCT r.Retailer_code, ds.Product_number
+                                FROM
+                                    go_retailers r,
+                                    go_daily_sales ds,
+                                    go_products p
+                                WHERE
+                                    r.Retailer_code = ds.Retailer_code
+                                    AND ds.Product_number = p.Product_number
+                                    AND r.`Type` = %s
+                                    AND ds.`Date` BETWEEN %s AND %s) a,
+                            (
+                                SELECT DISTINCT r.Retailer_code, ds.Product_number
+                                FROM
+                                    go_retailers r,
+                                    go_daily_sales ds,
+                                    go_products p
+                                WHERE
+                                    r.Retailer_code = ds.Retailer_code
+                                    AND ds.Product_number = p.Product_number
+                                    AND r.`Type` = %s
+                                    AND ds.`Date` BETWEEN %s AND %s) b
+                        WHERE
+                            a.Product_number = b.Product_number
+                            AND a.Retailer_code < b.Retailer_code
+                        GROUP BY
+                            a.Retailer_code, b.Retailer_code
+                        HAVING
+                            COUNT(DISTINCT a.Product_number) >= %s
+                        ORDER BY
+                            affinity DESC, r1, r2"""
+            cursor.execute(query, (rtype, dateFrom, dateTo, rtype, dateFrom, dateTo, Affinity))
             for row in cursor:
-                result.append(row["pl"])
+                result.append((row["r1"], row["r2"], row["affinity"]))
 
             cursor.close()
             cnx.close()
