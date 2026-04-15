@@ -5,6 +5,8 @@ class View(ft.UserControl):
     def __init__(self, page: ft.Page):
         super().__init__()
 
+        self.sl_max_length = None
+        self.dd_Retailer = None
         self.btn_dp_to = None
         self.btn_dp_from = None
         self.dp_to = None
@@ -77,32 +79,32 @@ class View(ft.UserControl):
                     ),padding=10, margin=ft.margin.only(top=5, bottom=5), bgcolor=ft.colors.GREY_200, border_radius=10, width=900)
 
         self.btn_build_graph = ft.ElevatedButton(text="Crea Grafo", icon=ft.icons.HUB, on_click=self._controller.handle_graph)
-        self.btn_run_strong = ft.ElevatedButton(text="Cammino Vincente", icon=ft.icons.TRENDING_UP)
-        self.btn_run_weak = ft.ElevatedButton(text="Cammino Debole", icon=ft.icons.TRENDING_DOWN)
+        self.btn_run_strong = ft.ElevatedButton(text="Cammino Vincente", icon=ft.icons.TRENDING_UP, disabled=True, on_click=self._controller.handle_camminoVincente)
+        self.btn_run_weak = ft.ElevatedButton(text="Cammino Debole", icon=ft.icons.TRENDING_DOWN, disabled=True)
         self.btn_reset = ft.TextButton(text="Reset Filtri", on_click=self._controller.on_reset)
 
-        row3 = ft.Row([self.btn_build_graph, self.btn_run_strong, self.btn_run_weak, self.btn_reset], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
+        self.dd_Retailer = ft.Dropdown(label = "Retailer", hint_text="Seleziona un Retailer", width = 300, on_change=self._controller.on_filters_changed, disabled=True)
+        self.sl_max_length = ft.Slider(min=1, max=20, divisions=19, value=3, label="{value}", width=300, tooltip="Numero massimo di archi del cammino ricorsivo", disabled=True)
+
+        row3 = ft.Row([self.btn_build_graph], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
+        row3_1 = ft.Row([ self.dd_Retailer,  self.sl_max_length], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
+        row3_2 = ft.Row([self.btn_run_strong, self.btn_run_weak, self.btn_reset], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
 
         self.txt_result_temp = ft.ListView(auto_scroll= False)
         row4 = ft.Row([self.txt_result_temp], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
 
         self.graph_image = ft.Image(src_base64="", width=1200, fit=ft.ImageFit.CONTAIN, visible=False)
         graph_box = ft.Container(content = self.graph_image,
-                                 padding=5, border = ft.border.all(1, ft.colors.GREY_400), border_radius=10, width=900, height=500)
+                                 padding=5, border = ft.border.all(1, ft.colors.BLUE_300), border_radius=10, width=900, height=500)
 
         row5 = ft.Row([graph_box], alignment= ft.MainAxisAlignment.CENTER)
 
+        #inserisco tutto dentro ad un ft.Column per avere l'interfaccia scrollabile
+        main_layout = ft.Column(controls=[row1, row1_1, row2, affinity_expl, row3, row3_1, row3_2, row4, row5], scroll=ft.ScrollMode.AUTO,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing = 15, expand=True)
 
-
-        self._page.controls.append(row1)
-        self._page.controls.append(row1_1)
-        self._page.controls.append(row2)
-        self._page.controls.append(affinity_expl)
-        self._page.controls.append(row3)
-        self._page.controls.append(row4)
-        self._page.controls.append(row5)
-
-
+        self._page.controls.clear()
+        self._page.add(main_layout)
         self._page.update()
 
 

@@ -1,4 +1,8 @@
+import copy
+
 import networkx as nx
+from pyparsing import nestedExpr
+
 from database.DAO import DAO
 import matplotlib.pyplot as plt
 import os
@@ -66,7 +70,7 @@ class Model:
 
     def drawGraphToFile(self, outpath: str = "graph.png") -> str:
         '''
-        Disegna il grafo creato salvandolo in un file pgn
+        Disegna il grafo creato salvandolo in un file png
         :param outpath: percorso del file PNG di output
         :return: percorso del file PNG
         '''
@@ -97,6 +101,86 @@ class Model:
 
     def getGraphDetails(self):
         return self._graph.number_of_nodes(), self._graph.number_of_edges()
+
+
+    def getCamminoVincente(self, retailer_partenza, maxLength):
+        '''
+        Algoritmo che va a identificare le sequenze forti che vanno a massimizzare i pesi degli archi (affinità) tra i nodi (retailer)
+        :param retailer_partenza: Nodo di Partenza scelto dall'utente
+        :param maxLength: lunghezza massima del cammino
+        :return: tupla comprensiva di lista contenente tutti i nodi e valore del peso della sequenza
+        '''
+        self._bestPath = []
+        self._bestWeight = 0
+
+        parziale = [retailer_partenza]
+        self.ricorsioneCamminoVincente(retailer_partenza, parziale, 0, maxLength)
+        return self._bestPath, self._bestWeight
+
+    def ricorsioneCamminoVincente(self, nodoCorrente, parziale, pesoCorrente, maxLength):
+
+        if pesoCorrente > self._bestWeight:
+            self._bestWeight = pesoCorrente
+            self._bestPath = copy.deepcopy(parziale)
+
+        if len(parziale)-1  == maxLength:
+            return
+
+        for n in self._graph.neighbors(nodoCorrente):
+            if n not in parziale:
+                pesoArco = self._graph[nodoCorrente][n]["weight"]
+                parziale.append(n)
+                self.ricorsioneCamminoVincente(n, parziale, pesoCorrente + pesoArco, maxLength)
+                parziale.pop()
+
+    def drawBestPathToFile(self, bestPath, outpath: str = "best_path.png") -> str:
+        '''
+        Disegna il grafo complessivo, evidenziando il cammino vincente trovato con la ricorsione
+        :param BestPath: lista dei nodi del cammino vincente
+        :param outpath: nome file png di output
+        :return: percorso assoluto del file
+        '''
+        if self._graph.number_of_nodes() == 0:
+            raise ValueError("Grafo vuoto, niente da disegnare")
+
+        if bestPath is None or len(bestPath) == 0:
+            raise ValueError("Cammino Vuoto, niente da Evidenziare")
+
+        pos = nx.circular_layout(self._graph)
+        fig, ax = plt.subplots(figsize=(14.4, 8))
+
+        #nodi normali
+        nx.draw_networkx_nodes(self._graph, pos, ax = ax, node_size=300)
+        #archi normali
+        nx.draw_networkx_edges(self._graph, pos, ax = ax, edge_color='lightgray', width=1.5)
+
+        #archi del cammino
+        path_edges = []
+        for i in range(len(bestPath)-1):
+            u = bestPath[i]
+            v = bestPath[i + 1]
+            if self._graph.has_edge(u, v):
+                path_edges.append((u, v))
+        nx.draw_networkx_edges(self._graph, pos, path_edges, edge_color='red', width=3)
+
+        #nodi del cammino evidenziali
+        nx.draw_networkx_nodes(self._graph, pos, ax = ax, nodelist = bestPath, node_size=300)
+
+        labels = {n: n.Retailer_name for n in self._graph.nodes()}
+        nx.draw_networkx_labels(self._graph, pos = pos,ax=ax,  labels=labels, font_size=12)
+
+        edges_labels = nx.get_edge_attributes(self._graph, 'weight')
+        nx.draw_networkx_edge_labels(self._graph, pos=pos, ax=ax, edge_labels=edges_labels, font_size=10)
+
+
+        ax.set_axis_off()
+        plt.margins(0.20)
+        plt.savefig(outpath, dpi=200, bbox_inches='tight')
+        plt.close()
+        return os.path.abspath(outpath)
+
+
+
 
 
 

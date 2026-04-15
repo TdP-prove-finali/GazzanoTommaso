@@ -14,6 +14,11 @@ class Controller:
         self._view.dd_Types_filter.options = [ft.dropdown.Option(x) for x in lista]
         self._view.update_page()
 
+    def fillDDRetailer(self):
+        lista = self._model._graph.nodes()
+        self._view.dd_Retailer.options = [ft.dropdown.Option(key=str(x.Retailer_code), text=x.Retailer_name) for x in lista]
+        self._view.update_page()
+
     # def fillDDProductLines(self):
     #     rtype = self._view.dd_Types_filter.value
     #     lista = self._model.getAllProductLines(rtype)
@@ -76,6 +81,12 @@ class Controller:
         # --- Costruzione Grafo ---
         self._model.buildGraph(type, dateFrom, dateTo, affinity)
         nNodes, nEdges = self._model.getGraphDetails()
+        self.fillDDRetailer()
+        self._view.dd_Retailer.disabled = False
+        self._view.sl_max_length.disabled = False
+        self._view.btn_run_strong.disabled = False
+        self._view.btn_run_weak.disabled = False
+        self._view.sl_max_length.disabled = False
 
         # --- Disegno e Visualizzazione ---
         try:
@@ -94,7 +105,6 @@ class Controller:
             self._view.txt_result_temp.controls.clear()
             self._view.txt_result_temp.controls.append(ft.Text(f"Errore nel disegno del grafo: {e}", color = "red"))
             self._view.update_page()
-
 
 
     def on_reset(self, e):
@@ -125,6 +135,53 @@ class Controller:
         #self._view.dd_ProductLine_filter.disabled = False
 
         self._view.update_page()
+
+
+    def handle_camminoVincente(self, e):
+        retailer_id = self._view.dd_Retailer.value
+        maxLength = self._view.sl_max_length.value
+
+        if retailer_id is None:
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(ft.Text(f"Attenzione, selezionare un retailer di partenza", color = "red"))
+            self._view.update_page()
+            return
+
+        if maxLength is None:
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(ft.Text(f"Attenzione, selezionare una lunghezza massima del cammino", color="red"))
+            self._view.update_page()
+            return
+
+        nodo_partenza = self._model._idMap[int(retailer_id)]
+
+        bestPath, bestWeight = self._model.getCamminoVincente(nodo_partenza, int(maxLength))
+
+        if not bestPath:
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(ft.Text(f"Nessuno cammino trovato", color="red"))
+            self._view.update_page()
+
+        try:
+            img_path = self._model.drawBestPathToFile(bestPath, "best_path.png")
+            with open(img_path, "rb") as f:
+                self._view.graph_image.src_base64 = base64.b64encode(f.read()).decode("utf-8")
+            self._view.graph_image.visible = True
+            self._view.graph_image.update()
+
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(ft.Text("Cammino vincente:"))
+            self._view.txt_result_temp.controls.append(ft.Text(f"Peso totale: {bestWeight}"))
+            self._view.update_page()
+
+        except Exception as e:
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(
+                ft.Text(f"Errore nel disegno del cammino: {e}", color="red"))
+            self._view.update_page()
+
+
+
 
 
 
