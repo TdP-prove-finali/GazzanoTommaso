@@ -17,7 +17,7 @@ class View(ft.UserControl):
         self.btn_run_strong = None
         self.btn_build_graph = None
         self.sl_affinity_threshold = None
-        self.dd_ProductLine_filter = None
+        #self.dd_ProductLine_filter = None
         self.dd_Types_filter = None
         self.dd_Country_filter = None
         self.graph_image = None
@@ -34,7 +34,7 @@ class View(ft.UserControl):
     def load_interface(self):
 
         self.dd_Types_filter = ft.Dropdown(label = "Tipologia di Retailer", hint_text="Seleziona una tipologia", width = 300, on_change=self._controller.on_filters_changed)
-        self.dd_ProductLine_filter = ft.Dropdown(label = "linea di Prodotto", hint_text="Seleziona una linea di prodotto", width = 300, disabled=True)
+        #self.dd_ProductLine_filter = ft.Dropdown(label = "linea di Prodotto", hint_text="Seleziona una linea di prodotto", width = 300, disabled=True)
 
         self._controller.fillDDTypes()
 
@@ -64,7 +64,7 @@ class View(ft.UserControl):
             on_click=lambda _: self.dp_to.pick_date()
         )
 
-        row1 = ft.Row([self.dd_Types_filter, self.dd_ProductLine_filter], alignment= ft.MainAxisAlignment.CENTER)
+        row1 = ft.Row([self.dd_Types_filter], alignment= ft.MainAxisAlignment.CENTER)
         row1_1 = ft.Row([self.btn_dp_from, self.btn_dp_to], alignment= ft.MainAxisAlignment.CENTER)
         self.sl_affinity_threshold = ft.Slider(min = 1, max = 20, divisions=19, value = 3, label = "{value}", width= 300, tooltip="Numero minimo di prodotti in comune per creare un arco")
         row2 = ft.Row([ft.Text("Soglia di Affinità"), self.sl_affinity_threshold], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
@@ -80,7 +80,7 @@ class View(ft.UserControl):
 
         self.btn_build_graph = ft.ElevatedButton(text="Crea Grafo", icon=ft.icons.HUB, on_click=self._controller.handle_graph)
         self.btn_run_strong = ft.ElevatedButton(text="Cammino Vincente", icon=ft.icons.TRENDING_UP, disabled=True, on_click=self._controller.handle_camminoVincente)
-        self.btn_run_weak = ft.ElevatedButton(text="Cammino Debole", icon=ft.icons.TRENDING_DOWN, disabled=True)
+        self.btn_run_weak = ft.ElevatedButton(text="Cammino Debole", icon=ft.icons.TRENDING_DOWN, disabled=True, on_click=self._controller.handle_camminoDebole)
         self.btn_reset = ft.TextButton(text="Reset Filtri", on_click=self._controller.on_reset)
 
         self.dd_Retailer = ft.Dropdown(label = "Retailer", hint_text="Seleziona un Retailer", width = 300, on_change=self._controller.on_filters_changed, disabled=True)

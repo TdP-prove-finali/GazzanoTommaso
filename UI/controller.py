@@ -161,6 +161,7 @@ class Controller:
             self._view.txt_result_temp.controls.clear()
             self._view.txt_result_temp.controls.append(ft.Text(f"Nessuno cammino trovato", color="red"))
             self._view.update_page()
+            return
 
         try:
             img_path = self._model.drawBestPathToFile(bestPath, "best_path.png")
@@ -170,7 +171,6 @@ class Controller:
             self._view.graph_image.update()
 
             self._view.txt_result_temp.controls.clear()
-            self._view.txt_result_temp.controls.append(ft.Text("Cammino vincente:"))
             self._view.txt_result_temp.controls.append(ft.Text(f"Peso totale: {bestWeight}"))
             self._view.update_page()
 
@@ -179,6 +179,49 @@ class Controller:
             self._view.txt_result_temp.controls.append(
                 ft.Text(f"Errore nel disegno del cammino: {e}", color="red"))
             self._view.update_page()
+
+    def handle_camminoDebole(self, e):
+        retailer_id = self._view.dd_Retailer.value
+        maxLength = self._view.sl_max_length.value
+
+        if retailer_id is None:
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(ft.Text(f"Attenzione, selezionare un retailer di partenza", color = "red"))
+            self._view.update_page()
+            return
+
+        if maxLength is None:
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(ft.Text(f"Attenzione, selezionare una lunghezza massima del cammino", color="red"))
+            self._view.update_page()
+            return
+
+        nodo_partenza = self._model._idMap[int(retailer_id)]
+        worstPath,worstWeight = self._model.getCamminoDebole(nodo_partenza, int(maxLength))
+
+        if not worstPath:
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(ft.Text(f"Nessuno cammino trovato", color="red"))
+            self._view.update_page()
+            return
+
+        try:
+            img_path = self._model.drawWorstPathToFile(worstPath, "worst_path.png")
+            with open(img_path, "rb") as f:
+                self._view.graph_image.src_base64 = base64.b64encode(f.read()).decode("utf-8")
+            self._view.graph_image.visible = True
+            self._view.graph_image.update()
+
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(ft.Text(f"Peso totale: {worstWeight}"))
+            self._view.update_page()
+
+        except Exception as e:
+            self._view.txt_result_temp.controls.clear()
+            self._view.txt_result_temp.controls.append(
+                ft.Text(f"Errore nel disegno del cammino: {e}", color="red"))
+            self._view.update_page()
+
 
 
 
