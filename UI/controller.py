@@ -15,8 +15,11 @@ class Controller:
         self._view.update_page()
 
     def fillDDRetailer(self):
-        lista = self._model._graph.nodes()
-        self._view.dd_Retailer.options = [ft.dropdown.Option(key=str(x.Retailer_code), text=x.Retailer_name) for x in lista]
+        lista = [n for n in self._model._graph.nodes() if self._model._graph.degree(n) > 0]
+        self._view.dd_Retailer.options = [
+            ft.dropdown.Option(key=str(x.Retailer_code), text=x.Retailer_name)
+            for x in lista
+        ]
         self._view.update_page()
 
     # def fillDDProductLines(self):

@@ -66,7 +66,7 @@ class View(ft.UserControl):
 
         row1 = ft.Row([self.dd_Types_filter], alignment= ft.MainAxisAlignment.CENTER)
         row1_1 = ft.Row([self.btn_dp_from, self.btn_dp_to], alignment= ft.MainAxisAlignment.CENTER)
-        self.sl_affinity_threshold = ft.Slider(min = 1, max = 20, divisions=19, value = 3, label = "{value}", width= 300, tooltip="Numero minimo di prodotti in comune per creare un arco")
+        self.sl_affinity_threshold = ft.Slider(min = 1, max = 50, divisions=19, value = 3, label = "{value}", width= 300, tooltip="Numero minimo di prodotti in comune per creare un arco")
         row2 = ft.Row([ft.Text("Soglia di Affinità"), self.sl_affinity_threshold], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
 
         affinity_expl = ft.Container(
@@ -93,9 +93,9 @@ class View(ft.UserControl):
         self.txt_result_temp = ft.ListView(auto_scroll= False)
         row4 = ft.Row([self.txt_result_temp], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
 
-        self.graph_image = ft.Image(src_base64="", width=1200, fit=ft.ImageFit.CONTAIN, visible=False)
+        self.graph_image = ft.Image(src_base64="", fit=ft.ImageFit.CONTAIN, visible=False)
         graph_box = ft.Container(content = self.graph_image,
-                                 padding=5, border = ft.border.all(1, ft.colors.BLUE_300), border_radius=10, width=900, height=500)
+                                 padding=5, border = ft.border.all(1, ft.colors.BLUE_300), border_radius=10, width=1000, height=700)
 
         row5 = ft.Row([graph_box], alignment= ft.MainAxisAlignment.CENTER)
 

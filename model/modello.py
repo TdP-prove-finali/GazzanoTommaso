@@ -78,13 +78,19 @@ class Model:
         if self._graph.number_of_nodes() == 0:
             raise ValueError("Grafo vuoto, niente da disegnare")
 
+        isolated_nodes  = list(nx.isolates(self._graph))
+        self._graph.remove_nodes_from(isolated_nodes)
+
+        if self._graph.number_of_nodes() == 0:
+            raise ValueError("Nessun nodo connesso da disegnare")
+
 
         pos = nx.circular_layout(self._graph)
-        fig, ax = plt.subplots(figsize=(14.4, 8)) # ho usato questi pollici perché hanno la stessa proporzione delle domensioni del container in cui si trova l'img!
+        fig, ax = plt.subplots(figsize=(14.4, 10))
         nx.draw(self._graph, pos=pos, ax=ax,  with_labels=False, node_size=300, arrows=False)
 
         labels ={n: str(n) for n in self._graph.nodes()}
-        labels_pos = {n: (pos[n][0] * 1.15, pos[n][1]*1.15) for n in self._graph.nodes()}
+        labels_pos = {n: (pos[n][0] * 1.08, pos[n][1]*1.08) for n in self._graph.nodes()}
 
         nx.draw_networkx_labels(self._graph, pos=labels_pos, labels=labels, font_size=12, ax=ax)
 
@@ -172,11 +178,17 @@ class Model:
         if self._graph.number_of_nodes() == 0:
             raise ValueError("Grafo vuoto, niente da disegnare")
 
+        isolated_nodes = list(nx.isolates(self._graph))
+        self._graph.remove_nodes_from(isolated_nodes)
+
+        if self._graph.number_of_nodes() == 0:
+            raise ValueError("Nessun nodo connesso da disegnare")
+
         if bestPath is None or len(bestPath) == 0:
             raise ValueError("Cammino Vuoto, niente da Evidenziare")
 
         pos = nx.circular_layout(self._graph)
-        fig, ax = plt.subplots(figsize=(14.4, 8))
+        fig, ax = plt.subplots(figsize=(14.4, 10))
 
         #nodi normali
         nx.draw_networkx_nodes(self._graph, pos, ax = ax, node_size=300)
@@ -218,11 +230,17 @@ class Model:
         if self._graph.number_of_nodes() == 0:
             raise ValueError("Grafo vuoto, niente da disegnare")
 
+        isolated_nodes = list(nx.isolates(self._graph))
+        self._graph.remove_nodes_from(isolated_nodes)
+
+        if self._graph.number_of_nodes() == 0:
+            raise ValueError("Nessun nodo connesso da disegnare")
+
         if worstPath is None or len(worstPath) == 0:
             raise ValueError("Cammino Vuoto, niente da Evidenziare")
 
         pos = nx.circular_layout(self._graph)
-        fig, ax = plt.subplots(figsize=(14.4, 8))
+        fig, ax = plt.subplots(figsize=(14.4, 10))
 
         #nodi normali
         nx.draw_networkx_nodes(self._graph, pos, ax = ax, node_size=300)
