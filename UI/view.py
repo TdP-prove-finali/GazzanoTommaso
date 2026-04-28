@@ -117,5 +117,6 @@ class View(ft.UserControl):
         dlg.open = True
         self._page.update()
 
+
     def update_page(self):
         self._page.update()
