@@ -1,8 +1,6 @@
 import copy
 
 import networkx as nx
-from pyparsing import nestedExpr
-
 from database.DAO import DAO
 import matplotlib.pyplot as plt
 import os
@@ -108,7 +106,8 @@ class Model:
 
     def getCamminoVincente(self, retailer_partenza, maxLength):
         '''
-        Algoritmo che va a identificare le sequenze forti che vanno a massimizzare i pesi degli archi (affinità) tra i nodi (retailer)
+        Algoritmo che va a identificare le sequenze forti che vanno a massimizzare
+        i pesi degli archi (affinità) tra i nodi (retailer)
         :param retailer_partenza: Nodo di Partenza scelto dall'utente
         :param maxLength: lunghezza massima del cammino
         :return: tupla comprensiva di lista contenente tutti i nodi e valore del peso della sequenza
@@ -119,21 +118,6 @@ class Model:
         parziale = [retailer_partenza]
         self.ricorsioneCamminoVincente(retailer_partenza, parziale, 0, maxLength)
         return self._bestPath, self._bestWeight
-
-    def getCamminoDebole(self, retailer_partenza, maxLength):
-        '''
-        Algoritmo che va a indentificare le sequenze deboli che vanno a minimizzare i pesi degli archi (affinità) tra i nodi (retailer)
-        :param retailer_partenza: Nodo di Partenza scelto dall'utente
-        :param maxLength: lunghezza massima del cammino
-        :return: tupla comprensiva di lista contenente tutti i nodi e valore del peso della sequenza
-        '''
-        self._worstPath = []
-        self._worstWeight = float('inf')  #inizializzo per minimizzare
-
-        parziale = [retailer_partenza]
-        self.ricorsioneCamminoDebole(retailer_partenza, parziale, 0, maxLength)
-        return self._worstPath, self._worstWeight
-
 
     def ricorsioneCamminoVincente(self, nodoCorrente, parziale, pesoCorrente, maxLength):
         if pesoCorrente > self._bestWeight:
@@ -152,6 +136,20 @@ class Model:
 
     def getTopProductsPath(self, path, dateFrom, dateTo):
         return DAO.getTopProductsPath(path, dateFrom, dateTo)
+
+    def getCamminoDebole(self, retailer_partenza, maxLength):
+        '''
+        Algoritmo che va a indentificare le sequenze deboli che vanno a minimizzare i pesi degli archi (affinità) tra i nodi (retailer)
+        :param retailer_partenza: Nodo di Partenza scelto dall'utente
+        :param maxLength: lunghezza massima del cammino
+        :return: tupla comprensiva di lista contenente tutti i nodi e valore del peso della sequenza
+        '''
+        self._worstPath = []
+        self._worstWeight = float('inf')  #inizializzo per minimizzare
+
+        parziale = [retailer_partenza]
+        self.ricorsioneCamminoDebole(retailer_partenza, parziale, 0, maxLength)
+        return self._worstPath, self._worstWeight
 
     def ricorsioneCamminoDebole(self, nodoCorrente, parziale, pesoCorrente, maxLength):
         if len(parziale)-1 == maxLength:
@@ -192,7 +190,7 @@ class Model:
         pos = nx.circular_layout(self._graph)
         fig, ax = plt.subplots(figsize=(14.4, 10))
 
-        #disegna il grafo di base in modo dentro
+        #disegna il grafo di base
         nx.draw_networkx_nodes(self._graph, pos, ax = ax, node_size=300)
         nx.draw_networkx_edges(self._graph, pos, ax = ax, edge_color='lightgray', width=1.5)
 
@@ -213,8 +211,6 @@ class Model:
 
         edges_labels = nx.get_edge_attributes(self._graph, 'weight')
         nx.draw_networkx_edge_labels(self._graph, pos=pos, ax=ax, edge_labels=edges_labels, font_size=10)
-
-
         ax.set_axis_off()
         plt.margins(0.20)
         plt.savefig(outpath, dpi=200, bbox_inches='tight')
