@@ -17,7 +17,6 @@ class View(ft.UserControl):
         self.btn_run_strong = None
         self.btn_build_graph = None
         self.sl_affinity_threshold = None
-        #self.dd_ProductLine_filter = None
         self.dd_Types_filter = None
         self.dd_Country_filter = None
         self.graph_image = None
@@ -28,13 +27,11 @@ class View(ft.UserControl):
         self._page.window_height = 900
         self._page.window_center()
         self._page.theme_mode = ft.ThemeMode.LIGHT
-        # controller (it is not initialized. Must be initialized in the main, after the controller is created)
         self._controller = None
 
     def load_interface(self):
 
-        self.dd_Types_filter = ft.Dropdown(label = "Tipologia di Retailer", hint_text="Seleziona una tipologia", width = 300, on_change=self._controller.on_filters_changed)
-        #self.dd_ProductLine_filter = ft.Dropdown(label = "linea di Prodotto", hint_text="Seleziona una linea di prodotto", width = 300, disabled=True)
+        self.dd_Types_filter = ft.Dropdown(label = "Tipologia di Retailer", hint_text="Seleziona una tipologia", width = 300)
 
         self._controller.fillDDTypes()
 
@@ -83,7 +80,7 @@ class View(ft.UserControl):
         self.btn_run_weak = ft.ElevatedButton(text="Cammino Debole", icon=ft.icons.TRENDING_DOWN, disabled=True, on_click=self._controller.handle_camminoDebole)
         self.btn_reset = ft.TextButton(text="Reset Filtri", on_click=self._controller.on_reset)
 
-        self.dd_Retailer = ft.Dropdown(label = "Retailer", hint_text="Seleziona un Retailer", width = 300, on_change=self._controller.on_filters_changed, disabled=True)
+        self.dd_Retailer = ft.Dropdown(label = "Retailer", hint_text="Seleziona un Retailer", width = 300, disabled=True)
         self.sl_max_length = ft.Slider(min=1, max=20, divisions=19, value=3, label="{value}", width=300, tooltip="Numero massimo di archi del cammino ricorsivo", disabled=True)
 
         row3 = ft.Row([self.btn_build_graph], alignment= ft.MainAxisAlignment.CENTER, spacing=20)
