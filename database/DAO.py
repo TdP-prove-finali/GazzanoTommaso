@@ -1,5 +1,3 @@
-from idlelib.debugger_r import IdbAdapter
-
 from database.DB_connect import DBConnect
 from model.Retailer import Retailer
 

@@ -46,6 +46,12 @@ class Model:
         '''
         return DAO.getAllEdges(rtype, dateFrom, dateTo, affinity)
 
+    def buildGraph(self, rtype, dateFrom, dateTo, affinity):
+        self._graph.clear()
+        self.getAllRetailer(rtype, dateFrom, dateTo)
+        self._graph.add_nodes_from(self._retailer)
+        self.addAllEdges(rtype, dateFrom, dateTo, affinity)
+
     def addAllEdges(self, rtype, dateFrom, dateTo, affinity):
         edges = self.getAllEdges(rtype, dateFrom, dateTo, affinity)
         for r1, r2, w in edges:
@@ -55,11 +61,7 @@ class Model:
                 self._graph.add_edge(n1, n2, weight=w)
 
 
-    def buildGraph(self, rtype, dateFrom, dateTo, affinity):
-        self._graph.clear()
-        self.getAllRetailer(rtype, dateFrom, dateTo)
-        self._graph.add_nodes_from(self._retailer)
-        self.addAllEdges(rtype, dateFrom, dateTo, affinity)
+
 
     def drawGraphToFile(self, outpath: str = "graph.png") -> str:
         '''
@@ -71,7 +73,8 @@ class Model:
         if self._graph.number_of_nodes() == 0:
             raise ValueError("Grafo vuoto, niente da disegnare")
 
-        # rimuove i nodi isolati (senza archi) per evitare di riempire il disegno di informazioni non significative
+        # rimuove i nodi isolati (senza archi) per evitare di riempire il disegno di
+        # informazioni non significative
         isolated_nodes  = list(nx.isolates(self._graph))
         self._graph.remove_nodes_from(isolated_nodes)
 
@@ -80,7 +83,8 @@ class Model:
 
 
         pos = nx.circular_layout(self._graph)
-        fig, ax = plt.subplots(figsize=(14.4, 10))  #fig = contenitore dell'intera figura (canvas), ax = zona di disegno all'interno di fig
+        fig, ax = plt.subplots(figsize=(14.4, 10))  #fig = contenitore dell'intera figura (canvas),
+        # ax = zona di disegno all'interno di fig
         nx.draw(self._graph, pos=pos, ax=ax,  with_labels=False, node_size=300, arrows=False)
 
         labels ={n: str(n) for n in self._graph.nodes()}
