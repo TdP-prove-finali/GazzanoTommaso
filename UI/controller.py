@@ -36,11 +36,6 @@ class Controller:
             self._view.update_page()
             return
 
-        if affinity is None:
-            self._view.txt_result_temp.controls.clear()
-            self._view.txt_result_temp.controls.append(ft.Text(f"Attenzione, selezionare una soglia di affinità dal relativo slider", color = "red"))
-            self._view.update_page()
-            return
 
         if dateFrom is None or dateTo is None:
             self._view.txt_result_temp.controls.clear()
