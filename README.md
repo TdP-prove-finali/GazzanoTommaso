@@ -9,4 +9,4 @@
 5. Scaricare il data-set presente nella cartella database ed eseguire nell'ambiente personale
 6. Eseguire la classe main per avviare l’applicazione
 
-Video dimostrativo sull'uso dell'applicazione disponibile al link: [da aggiungere]
+Video dimostrativo sull'uso dell'applicazione disponibile al link: https://youtu.be/Cw4knQ0QFZY
