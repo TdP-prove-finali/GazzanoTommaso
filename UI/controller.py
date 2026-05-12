@@ -112,11 +112,7 @@ class Controller:
             self._view.update_page()
             return
 
-        if maxLength is None:
-            self._view.txt_result_temp.controls.clear()
-            self._view.txt_result_temp.controls.append(ft.Text(f"Attenzione, selezionare una lunghezza massima del cammino", color="red"))
-            self._view.update_page()
-            return
+
 
         nodo_partenza = self._model._idMap[int(retailer_id)]
         bestPath, bestWeight = self._model.getCamminoVincente(nodo_partenza, int(maxLength))
