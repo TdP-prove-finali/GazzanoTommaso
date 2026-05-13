@@ -1,7 +1,6 @@
 import flet as ft
 from UI.view import View
 from model.modello import Model
-import time
 import base64
 
 class Controller:
@@ -45,7 +44,7 @@ class Controller:
 
         if dateFrom > dateTo:
             self._view.txt_result_temp.controls.clear()
-            self._view.txt_result_temp.controls.append(ft.Text(f"Attenzione, la data di partenza non può essere successiva e quella di arrivo", color = "red"))
+            self._view.txt_result_temp.controls.append(ft.Text(f"Attenzione, la data di partenza non può essere successiva a quella di arrivo", color = "red"))
             self._view.update_page()
             return
 
